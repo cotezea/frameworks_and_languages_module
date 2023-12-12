@@ -29,4 +29,17 @@ exports.getAllItems = (req, res) => {
 exports.addItem = (req, res) => {
     // Logic to add an item
 };
+// app.js
+
+const express = require('express');
+const itemsRoutes = require('./routes/itemsRoutes');
+
+const app = express();
+
+app.use(express.json()); // Middleware to parse JSON bodies
+
+// Use itemsRoutes for the '/api/items' path
+app.use('/api/items', itemsRoutes);
+
+// ... rest of your Express app setup ...
 
