@@ -1,4 +1,7 @@
-FROM python:alpine
-WORKDIR /app/
+FROM node:alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
 COPY . .
-CMD [ "python", "-m", "http.server", "8000" ]
+CMD ["node", "app.js"]
+EXPOSE 8000
