@@ -8,6 +8,6 @@ run:
 
 ## Local
 local_install:
-	npm install express
+	npm install
 local_run:
 	node app.js
