@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const itemsRoutes = require('./routes/itemsRoutes');
+const itemsRoutes = require('./routes');
 
 const app = express();
 
@@ -13,8 +13,7 @@ app.use('/api/items', itemsRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-const express = require('express');
-const { getAllItems, addItem } = require('../controllers/itemsController');
+const { getAllItems, addItem } = require('./itemscontroller');
 
 const router = express.Router();
 
@@ -29,12 +28,10 @@ exports.getAllItems = (req, res) => {
 exports.addItem = (req, res) => {
    
 };
-const express = require('express');
-const itemsRoutes = require('./routes/itemsRoutes');
 
-const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use('/api/items', itemsRoutes);
+
 
 
 
