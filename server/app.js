@@ -31,7 +31,3 @@ exports.addItem = (req, res) => {
 
 app.use(express.json()); // Middleware to parse JSON bodies
 app.use('/api/items', itemsRoutes);
-
-
-
-
