@@ -1,9 +1,11 @@
-from typing import List, Optional
-from fastapi import FastAPI, HTTPException, Response, status, Depends
+from fastapi import FastAPI, HTTPException, Response, status, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from models import Item, ItemCreate, Location, DateRange
+from typing import List, Optional
+from models import Item, ItemCreate
 from datetime import datetime
+from fastapi.exceptions import RequestValidationError
+from fastapi.encoders import jsonable_encoder
 import uuid
 
 app = FastAPI()
@@ -15,7 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-items_id_counter = 1
 items = {}
 
 @app.get("/", response_class=HTMLResponse)
@@ -31,10 +32,9 @@ def verify_item_create(item: dict) -> Optional[str]:
 
 @app.post("/item/", response_model=Item, status_code=status.HTTP_201_CREATED)
 async def create_item(item: ItemCreate):
-    item_id = str(items_id_counter)
+    item_id = str(uuid.uuid4())
     new_item = Item(id=item_id, date_from=datetime.now().isoformat(), **item.dict())
     items[item_id] = new_item
-    items_id_counter += 1
     return new_item
 
 @app.get("/item/{item_id}/", response_model=Item)
@@ -77,16 +77,11 @@ async def options_items() -> Response:
         "Access-Control-Allow-Methods": "GET, OPTIONS",
     })
 
-@app.exception_handler(status.HTTP_422_UNPROCESSABLE_ENTITY)
-async def validation_exception_handler(request, exc):
-    error_msg = verify_item_create(request.json())
-    if error_msg:
-        content = {"message": "Validation error", "details": error_msg}
-    else:
-        content = {"message": "Method not allowed"}
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
-        status_code=status.HTTP_405_METHOD_NOT_ALLOWED if error_msg else status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=content
+        status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+        content=jsonable_encoder({"detail": exc.errors()}),
     )
 
 if __name__ == "__main__":
